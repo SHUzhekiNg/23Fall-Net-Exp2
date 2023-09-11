@@ -3,13 +3,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import core.TCPClient;
 
 public class GUIClient extends JFrame{
     private JTextField usernameField;
     private JPasswordField passwordField;
-
+    private JButton uploadButtonTCP;
+    private JLabel selectedFileLabel;
+    private String status;
     public GUIClient() throws HeadlessException{
         this.setTitle("GUIClient");
         this.setSize(500, 250);
@@ -44,10 +47,12 @@ public class GUIClient extends JFrame{
                 try{
                     String username = usernameField.getText();
                     String password = new String(passwordField.getPassword());
-                    String status;
-                    status = TCPClient.TCPSent(username, password);
+                    
+                    status = TCPClient.TCPLogin(username, password);
                     if (status.equals("true")) {
-                        JOptionPane.showMessageDialog(GUIClient.this, "登录成功");
+                        // JOptionPane.showMessageDialog(GUIClient.this, "登录成功");
+                        dispose();
+                        createMainPage();
                     } else {
                         JOptionPane.showMessageDialog(GUIClient.this, "登录失败，请检查用户名和密码");
                     }
@@ -58,7 +63,6 @@ public class GUIClient extends JFrame{
         });
 
         this.add(jPanel);
-
         this.setVisible(true);
     }
 
@@ -75,6 +79,44 @@ public class GUIClient extends JFrame{
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(5, 5, 5, 5); // 添加一些间距
         panel.add(component, constraints);
+    }
+
+    private void createMainPage() {
+        // 创建新的主页面
+        JFrame mainFrame = new JFrame("Main Page");
+        mainFrame.setSize(800, 600);
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+        setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        selectedFileLabel = new JLabel("选择的文件: ");
+        panel.add(selectedFileLabel, BorderLayout.NORTH);
+
+        uploadButtonTCP = new JButton("选择文件");
+        uploadButtonTCP.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                int result = fileChooser.showOpenDialog(null);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    try{
+                        File selectedFile = fileChooser.getSelectedFile();
+                        selectedFileLabel.setText("选择的文件: " + selectedFile.getName());
+                        status = TCPClient.TCPFileUpload(selectedFile);
+                        JOptionPane.showMessageDialog(GUIClient.this, "上传成功");
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(GUIClient.this, "上传失败");
+                    }
+                }
+            }
+        });
+        panel.add(uploadButtonTCP, BorderLayout.CENTER);
+        mainFrame.add(panel);
+        mainFrame.setVisible(true);
     }
 
     public static void main(String[] args){
