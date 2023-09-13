@@ -1,2 +1,4 @@
+root 123
+admin 123
 zhekiNg 20021107
 mengqin 20030106
