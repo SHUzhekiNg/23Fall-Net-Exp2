@@ -7,7 +7,6 @@ public class ServerBooter {
     public static void main(String[] args) {
         ExecutorService executorService = Executors.newFixedThreadPool(3);
 
-        // 启动登录服务器
         Runnable loginServerTask = () -> {
             try {
                 TCPLoginServer.main(null);
@@ -15,8 +14,7 @@ public class ServerBooter {
                 e.printStackTrace();
             }
         };
-
-        // 启动文件服务器
+        
         Runnable TCPFileServerTask = () -> {
             try {
                 TCPFileServer.main(null);

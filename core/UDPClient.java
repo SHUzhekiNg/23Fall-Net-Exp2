@@ -23,7 +23,7 @@ public class UDPClient {
 
             byte[] fileData = Files.readAllBytes(Paths.get(uploadFile.getAbsolutePath()));
             int fileSize = fileData.length;
-            int chunkSize = 1024; // 每个数据包的大小
+            int chunkSize = 1024;
             int chunks = (int) Math.ceil((double) fileSize / chunkSize);
 
             for (int i = 0; i < chunks; i++) {

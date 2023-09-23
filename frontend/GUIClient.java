@@ -29,19 +29,16 @@ public class GUIClient extends JFrame{
         jPanel.setBackground(new Color(185, 213, 165));
         jPanel.setLayout(new GridBagLayout());
 
-        // 创建用户名标签和文本框
         JLabel usernameLabel = new JLabel("用户名:");
         usernameField = new JTextField(20);
         addComponent(jPanel, usernameLabel, 0, 0);
         addComponent(jPanel, usernameField, 1, 0);
 
-        // 创建密码标签和密码框
         JLabel passwordLabel = new JLabel("密码:");
         passwordField = new JPasswordField(20);
         addComponent(jPanel, passwordLabel, 0, 1);
         addComponent(jPanel, passwordField, 1, 1);
 
-        // 创建登录按钮
         JButton loginButton = new JButton("登录");
         addComponent(jPanel, loginButton, 0, 2, 1, 1);
 
@@ -86,7 +83,6 @@ public class GUIClient extends JFrame{
     }
 
     private void createMainPage() {
-        // 创建新的主页面
         JFrame mainFrame = new JFrame("Main Page");
         mainFrame.setSize(800, 600);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -98,7 +94,7 @@ public class GUIClient extends JFrame{
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(10, 10, 10, 10); // 控制组件间距
+        gbc.insets = new Insets(10, 10, 10, 10);
 
         selectedFileLabel = new JLabel("选择的文件: ");
         panel.add(selectedFileLabel, gbc);
