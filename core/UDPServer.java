@@ -4,21 +4,31 @@ package core;
 import java.io.*;
 import java.net.*;
 
-class UDPServer {
-    public static void main(String args[]) throws Exception {
-        DatagramSocket serverSocket = new DatagramSocket(9876);
+class UDPFileServer {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket socket = new DatagramSocket(6791);
+        int cnt = 1;
         byte[] receiveData = new byte[1024];
-        byte[] sendData = new byte[1024];
+
         while (true) {
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            serverSocket.receive(receivePacket);
-            String sentence = new String(receivePacket.getData());
-            InetAddress IPAddress = receivePacket.getAddress();
-            int port = receivePacket.getPort();
-            String capitalizedSentence = sentence.toUpperCase();
-            sendData = capitalizedSentence.getBytes();
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
-            serverSocket.send(sendPacket);
+            socket.receive(receivePacket);
+
+            byte[] fileData = receivePacket.getData();
+
+            String fileName = "received_file_udp" + String.valueOf(cnt) + ".txt";
+            cnt++;
+
+            FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+            fileOutputStream.write(fileData, 0, receivePacket.getLength());
+            fileOutputStream.close();
+
+            InetAddress clientAddress = receivePacket.getAddress();
+            int clientPort = receivePacket.getPort();
+            String endMessage = "File transfer complete";
+            byte[] endData = endMessage.getBytes();
+            DatagramPacket endPacket = new DatagramPacket(endData, endData.length, clientAddress, clientPort);
+            socket.send(endPacket);
         }
     }
 }

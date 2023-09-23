@@ -3,22 +3,45 @@ package core;
 //UDPClient.java
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-class UDPClient {
-    public static void main(String args[]) throws Exception {
-        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-        DatagramSocket clientSocket = new DatagramSocket();
-        InetAddress IPAddress = InetAddress.getByName("localhost");
-        byte[] sendData = new byte[1024];
-        byte[] receiveData = new byte[1024];
-        String sentence = inFromUser.readLine();
-        sendData = sentence.getBytes();
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
-        clientSocket.send(sendPacket);
-        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        clientSocket.receive(receivePacket);
-        String modifiedSentence = new String(receivePacket.getData());
-        System.out.println("FROM SERVER:" + modifiedSentence);
-        clientSocket.close();
+public class UDPClient {
+    public static String UDPFileUpload(File uploadFile) throws Exception {
+        String serverHost = "localhost";
+        int serverPort = 6791;
+
+        DatagramSocket socket = new DatagramSocket();
+
+        try {
+            InetAddress serverAddress = InetAddress.getByName(serverHost);
+
+            if (!uploadFile.exists()) {
+                socket.close();
+                return "File not found";
+            }
+
+            byte[] fileData = Files.readAllBytes(Paths.get(uploadFile.getAbsolutePath()));
+            int fileSize = fileData.length;
+            int chunkSize = 1024; // 每个数据包的大小
+            int chunks = (int) Math.ceil((double) fileSize / chunkSize);
+
+            for (int i = 0; i < chunks; i++) {
+                int offset = i * chunkSize;
+                int length = Math.min(chunkSize, fileSize - offset);
+                byte[] chunk = new byte[length];
+                System.arraycopy(fileData, offset, chunk, 0, length);
+
+                DatagramPacket sendPacket = new DatagramPacket(chunk, length, serverAddress, serverPort);
+                socket.send(sendPacket);
+            }
+
+            socket.close();
+            return "File upload complete";
+        } catch (IOException e) {
+            e.printStackTrace();
+            socket.close();
+            return "File upload failed";
+        }
     }
 }

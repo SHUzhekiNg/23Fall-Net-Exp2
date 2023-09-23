@@ -6,12 +6,16 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import core.TCPClient;
+import core.UDPClient;
 
 public class GUIClient extends JFrame{
     private JTextField usernameField;
     private JPasswordField passwordField;
+    private JButton chooseButton;
     private JButton uploadButtonTCP;
+    private JButton uploadButtonUDP;
     private JLabel selectedFileLabel;
+    private File selectedFile;
     private String status;
     public GUIClient() throws HeadlessException{
         this.setTitle("GUIClient");
@@ -90,31 +94,62 @@ public class GUIClient extends JFrame{
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(10, 10, 10, 10); // 控制组件间距
 
         selectedFileLabel = new JLabel("选择的文件: ");
-        panel.add(selectedFileLabel, BorderLayout.NORTH);
+        panel.add(selectedFileLabel, gbc);
 
-        uploadButtonTCP = new JButton("选择文件");
-        uploadButtonTCP.addActionListener(new ActionListener() {
+        gbc.gridy++;
+        chooseButton = new JButton("选择文件");
+        chooseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
                 int result = fileChooser.showOpenDialog(null);
                 if (result == JFileChooser.APPROVE_OPTION) {
-                    try{
-                        File selectedFile = fileChooser.getSelectedFile();
-                        selectedFileLabel.setText("选择的文件: " + selectedFile.getName());
-                        status = TCPClient.TCPFileUpload(selectedFile);
-                        JOptionPane.showMessageDialog(GUIClient.this, "上传成功");
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(GUIClient.this, "上传失败");
-                    }
+                    selectedFile = fileChooser.getSelectedFile();
+                    selectedFileLabel.setText("选择的文件: " + selectedFile.getName());
                 }
             }
         });
-        panel.add(uploadButtonTCP, BorderLayout.CENTER);
+        panel.add(chooseButton, gbc);
+
+        gbc.gridy++;
+        uploadButtonTCP = new JButton("TCP上传");
+        uploadButtonTCP.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    status = TCPClient.TCPFileUpload(selectedFile);
+                    JOptionPane.showMessageDialog(GUIClient.this, "上传成功");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(GUIClient.this, "上传失败");
+                }
+            }
+        });
+        panel.add(uploadButtonTCP, gbc);
+
+        gbc.gridy++;
+        uploadButtonUDP = new JButton("UDP上传");
+        uploadButtonUDP.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    status = UDPClient.UDPFileUpload(selectedFile);
+                    JOptionPane.showMessageDialog(GUIClient.this, "上传成功");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(GUIClient.this, "上传失败");
+                }
+            }
+        });
+        panel.add(uploadButtonUDP, gbc);
+        
         mainFrame.add(panel);
         mainFrame.setVisible(true);
     }
